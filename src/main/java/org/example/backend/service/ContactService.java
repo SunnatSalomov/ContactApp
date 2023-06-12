@@ -8,18 +8,28 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class ContactService {
+    private Contact getContactByPhoneNumber(String phonenumber){
+         return  Database.CONTACT_LIST.stream().filter(contact -> contact.getPhoneNumber().equals(phonenumber))
+                 .findFirst().orElse(null);
+    }
     public Response login(String firstName, String phoneNumber) {
-        Contact contacts = null;
-        for (Contact contact : Database.CONTACT_LIST) {
-            if(contact.getPhoneNumber().equals(phoneNumber)){
-                contacts = contact;
+        try {
+            Contact contact = getContactByPhoneNumber(phoneNumber);
+
+            if (contact==null){
+                return new Response("not found", false);
             }
-        }
-        if (contacts!=null){
-            return new Response("Sucssefully", true);
+            if (!contact.getFirstName().equals(firstName)) {
+                return new Response("not found", false);
+            }
+
+            return new Response("Successfully", true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Response("not found", false);
         }
 
-        return new Response("not found", false);
     }
 
     public void showContact() {
